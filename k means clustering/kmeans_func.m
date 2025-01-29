@@ -1,0 +1,34 @@
+function [cluster_labels, centroids] = kmeans_func(data, k, max_iter)
+
+[n, d] = size(data);
+
+% rng(1);
+centroids = data(randperm(n, k), :);
+
+cluster_labels = zeros(n, 1);
+
+for iter = 1:max_iter
+    for i = 1:n
+        distances = sum((centroids - data(i, :)).^2, 2);
+        [~, cluster_labels(i)] = min(distances);
+    end
+
+    new_centroids = zeros(k, d);
+    for j = 1:k
+        points_in_cluster = data(cluster_labels == j, :);
+        if ~isempty(points_in_cluster)
+            new_centroids(j, :) = mean(points_in_cluster, 1);
+        else
+
+            new_centroids(j, :) = data(randi(n), :);
+        end
+    end
+
+    if all(abs(new_centroids - centroids) < 1e-6, 'all')
+        break;
+    end
+
+
+    centroids = new_centroids;
+end
+end
